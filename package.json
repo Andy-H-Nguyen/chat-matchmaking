@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ahng1996/chat-matchmaking#readme",
   "dependencies": {
-    "express": "^4.13.3"
+    "express": "^4.13.3",
+    "socket.io": "^1.3.7"
   }
 }
