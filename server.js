@@ -11,7 +11,20 @@ app.use(express.static(__dirname + '/public'));
 var clientInfo = {};
 
 io.on('connection', function (socket) {
-    console.log("User connected"); 
+    console.log("User connected");   
+    socket.on('disconnect', function() {
+        var userData = clientInfo[socket.id];
+        if (typeof userData !== 'undefined') {
+            socket.leave(clientInfo[socket.id]);
+            io.to(userData.room).emit('message', {
+               name: "System",
+               text: userData.name + ' has left!',
+               timestamp: moment().valueOf()
+            });
+            delete clientInfo[socket.id];
+        }
+    });
+    
     socket.on('joinRoom', function(req) {
         clientInfo[socket.id] = req;
         socket.join(req.room);

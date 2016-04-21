@@ -4,9 +4,9 @@ $( document ).ready(function() {
    var socket = io();
    
    console.log(name + ' is requesting to join room ' + room);
-   var $roomName = jQuery('.room-title');
-   $roomName.text(room);
+   jQuery('.room-title').text(room);
    
+   // Connection Event Handler
    socket.on('connect' , function() {
       console.log('Connected to server'); 
       socket.emit('joinRoom', {
@@ -15,6 +15,7 @@ $( document ).ready(function() {
          });
    });
    
+   // Message Event Handler
    socket.on('message', function(message) {
       var timestamp = moment.utc(message.timestamp);
       console.log(message.name + ':' + message.text);
@@ -24,7 +25,7 @@ $( document ).ready(function() {
       
    });
    
-   // Insert Code To Handle Messages
+   // Form Submission Event Handler
    var $form = jQuery('#message-form');
    
    $form.on('submit', function(event) {
