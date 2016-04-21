@@ -10,8 +10,38 @@ app.use(express.static(__dirname + '/public'));
 
 var clientInfo = {};
 
+function sendCurrentUsers(socket) {
+    var info = clientInfo[socket.id];
+    var users = [];
+    
+    if (typeof info === 'undefined') {
+        return;
+    }
+    
+    Object.keys(clientInfo).forEach(function (socketId) {
+        var userInfo = clientInfo[socketId];
+        if (info.room == userInfo.room) {
+            users.push(userInfo.name);   
+        }
+    });
+    
+    socket.emit('message', {
+        name: 'System',
+        text: 'Current users: ' + users.join(','),
+        timestamp: moment().valueOf()
+    });
+}
+
 io.on('connection', function (socket) {
     console.log("User connected");   
+    
+    socket.emit('message', {
+        name: 'System',
+        text: 'Welcome to chat-matchmaking',
+        timestamp: moment().valueOf()
+    });
+    
+    // Disconnect Event Handler
     socket.on('disconnect', function() {
         var userData = clientInfo[socket.id];
         if (typeof userData !== 'undefined') {
@@ -25,6 +55,7 @@ io.on('connection', function (socket) {
         }
     });
     
+    // Join Room Event Handler
     socket.on('joinRoom', function(req) {
         clientInfo[socket.id] = req;
         socket.join(req.room);
@@ -35,16 +66,15 @@ io.on('connection', function (socket) {
         });
     });
     
+    // Message Event Handler
     socket.on('message', function (message) {
         console.log("Message being broadcast: " + message.text);
         
-        io.to(clientInfo[socket.id].room).emit("message", message);
-    });
-    
-    socket.emit('message', {
-        name: 'System',
-        text: 'Welcome to chat-matchmaking',
-        timestamp: moment().valueOf()
+        if (message.text === '@currentUsers') {
+            sendCurrentUsers(socket);   
+        } else {
+            io.to(clientInfo[socket.id].room).emit("message", message); 
+        }
     });
 });
 

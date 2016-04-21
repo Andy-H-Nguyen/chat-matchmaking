@@ -18,7 +18,6 @@ $( document ).ready(function() {
    // Message Event Handler
    socket.on('message', function(message) {
       var timestamp = moment.utc(message.timestamp);
-      console.log(message.name + ':' + message.text);
       var $messages = jQuery('.messages');
       $messages.append('<p><strong>' + message.name + ' ' + timestamp.local().format('h:mma') + ' ' + '</strong></p>');
       $messages.append('<p>' + message.text + '</p>');
