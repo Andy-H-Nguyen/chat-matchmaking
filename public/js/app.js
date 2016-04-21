@@ -1,6 +1,6 @@
 $( document ).ready(function() {
-   var name = getQueryVariable('name');
-   var room = getComputedStyle('room')
+   var name = getQueryVariable('name') || 'Anonymous';
+   var room = getQueryVariable('room')
    var socket = io();
    
    console.log(name + ' is requesting to join room ' + room);
@@ -11,9 +11,11 @@ $( document ).ready(function() {
    
    socket.on('message', function(message) {
       var timestamp = moment.utc(message.timestamp);
-      console.log('New message:');
-      console.log(message.text);
-      jQuery('.messages').append('<p><strong>' + timestamp.local().format('h:mma') + '</strong>'+ ' ' + message.text + '</p>');
+      console.log(message.name + ':' + message.text);
+      var $messages = jQuery('.messages');
+      $messages.append('<p><strong>' + message.name + ' ' + timestamp.local().format('h:mma') + ' ' + '</strong></p>');
+      $messages.append('<p>' + message.text + '</p>');
+      
    });
    
    // Insert Code To Handle Messages
@@ -21,9 +23,10 @@ $( document ).ready(function() {
    
    $form.on('submit', function(event) {
       event.preventDefault();
-      var chatText = $form.find('input[name=message]').val();
+      var $chatText = $form.find('input[name=message]').val();
       socket.emit('message', {
-         text: chatText
+         name: name,
+         text: $chatText
       });
       $form.find('input[name=message]').val('');
    });
