@@ -4,9 +4,15 @@ $( document ).ready(function() {
    var socket = io();
    
    console.log(name + ' is requesting to join room ' + room);
+   var $roomName = jQuery('.room-title');
+   $roomName.text(room);
    
    socket.on('connect' , function() {
       console.log('Connected to server'); 
+      socket.emit('joinRoom', {
+            name: name,
+            room: room
+         });
    });
    
    socket.on('message', function(message) {
