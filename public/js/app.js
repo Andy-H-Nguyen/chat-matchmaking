@@ -1,6 +1,9 @@
 $( document ).ready(function() {
+   var name = getQueryVariable('name');
+   var room = getComputedStyle('room')
    var socket = io();
-   var now = moment();
+   
+   console.log(name + ' is requesting to join room ' + room);
    
    socket.on('connect' , function() {
       console.log('Connected to server'); 
