@@ -10,28 +10,6 @@ app.use(express.static(__dirname + '/public'));
 
 var clientInfo = {};
 
-function sendCurrentUsers(socket) {
-    var info = clientInfo[socket.id];
-    var users = [];
-    
-    if (typeof info === 'undefined') {
-        return;
-    }
-    
-    Object.keys(clientInfo).forEach(function (socketId) {
-        var userInfo = clientInfo[socketId];
-        if (info.room == userInfo.room) {
-            users.push(userInfo.name);   
-        }
-    });
-    
-    socket.emit('message', {
-        name: 'System',
-        text: 'Current users: ' + users.join(','),
-        timestamp: moment().valueOf()
-    });
-}
-
 io.on('connection', function (socket) {
     console.log("User connected");   
     
@@ -58,6 +36,7 @@ io.on('connection', function (socket) {
     // Join Room Event Handler
     socket.on('joinRoom', function(req) {
         clientInfo[socket.id] = req;
+        console.log(clientInfo);
         socket.join(req.room);
         socket.broadcast.to(req.room).emit('message', {
            name: 'System',
@@ -77,6 +56,28 @@ io.on('connection', function (socket) {
         }
     });
 });
+
+function sendCurrentUsers(socket) {
+    var info = clientInfo[socket.id];
+    var users = [];
+    
+    if (typeof info === 'undefined') {
+        return;
+    }
+    
+    Object.keys(clientInfo).forEach(function (socketId) {
+        var userInfo = clientInfo[socketId];
+        if (info.room == userInfo.room) {
+            users.push(userInfo.name);   
+        }
+    });
+    
+    socket.emit('message', {
+        name: 'System',
+        text: 'Current users: ' + users.join(','),
+        timestamp: moment().valueOf()
+    });
+}
 
 http.listen(PORT, function() {
     console.log("Server starting on " + PORT);

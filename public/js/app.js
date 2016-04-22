@@ -1,6 +1,10 @@
+/* global jQuery */
+/* global io */
+/* global getQueryVariable */
+/* global moment */
 $( document ).ready(function() {
    var name = getQueryVariable('name') || 'Anonymous';
-   var room = getQueryVariable('room')
+   var room = getQueryVariable('room');
    var socket = io();
    
    console.log(name + ' is requesting to join room ' + room);
