@@ -19,9 +19,10 @@ $( document ).ready(function() {
    socket.on('message', function(message) {
       var timestamp = moment.utc(message.timestamp);
       var $messages = jQuery('.messages');
-      $messages.append('<p><strong>' + message.name + ' ' + timestamp.local().format('h:mma') + ' ' + '</strong></p>');
-      $messages.append('<p>' + message.text + '</p>');
-      
+      var $message = jQuery('<li class="list-group-item"></li>');
+      $message.append('<p><strong>' + message.name + ' ' + timestamp.local().format('h:mma') + ' ' + '</strong></p>');
+      $message.append('<p>' + message.text + '</p>');
+      $messages.append($message);
    });
    
    // Form Submission Event Handler
