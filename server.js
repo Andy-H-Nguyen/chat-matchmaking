@@ -17,14 +17,22 @@ io.on('connection', function (socket) {
     // Disconnect Event Handler
     socket.on('disconnect', function() {
         var userData = clientInfo[socket.id];
-        if (typeof userData !== 'undefined') {
-            socket.leave(clientInfo[socket.id]);
+        
+        if (userData) {
+        var partnerId = clientInfo[socket.id].partner;
+        var partnerData = clientInfo[partnerId];
+        }
+        
+        if (typeof userData !== 'undefined' && typeof partnerData !== 'undefined') {
             io.to(userData.room).emit('message', {
                name: "System",
-               text: userData.name + ' has left!',
+               text: userData.name + ' has left! Please restart to find a new matchup.',
                timestamp: moment().valueOf()
             });
+            socket.leave(clientInfo[socket.id]);
+            socket.leave(clientInfo[partnerId]);
             delete clientInfo[socket.id];
+            delete clientInfo[partnerId];
         }
     });
     
@@ -32,12 +40,11 @@ io.on('connection', function (socket) {
     socket.on('joinRoom', function(req) {
     socket.emit('message', {
         name: 'System',
-        text: 'Welcome to chat-matchmaking, we are matching you now',
+        text: 'Welcome to chat-matchmaking, we are matching you now!',
         timestamp: moment().valueOf()
     });
         
         clientInfo[socket.id] = req;
-        var roomName = null;
         if (queue.length > 0) {
             var matchedSocket = queue.pop();
             var roomName = socket.id + '#' + matchedSocket.id;
@@ -50,21 +57,24 @@ io.on('connection', function (socket) {
             
             // Update ClientInfo
             clientInfo[socket.id].room = roomName;
+            clientInfo[socket.id].partner = matchedSocket.id;
             clientInfo[matchedSocket.id].room = roomName;
+            clientInfo[matchedSocket.id].partner = socket.id;
             
             matchedSocket.in(roomName).emit('message', {
                name: 'System',
-               text: 'You have been matched! Say hi to ' + name + ' !',
+               text: 'You have been matched! Say hi to ' + matchedName + ' !',
                timestamp: moment().valueOf()
             });
             
             socket.in(roomName).emit('message', {
                name: 'System',
-               text: 'You have been matched! Say hi to ' + matchedName + ' !',
+               text: 'You have been matched! Say hi to ' + name + ' !',
                timestamp: moment().valueOf()
             });
         } else {
-            clientInfo[socket.id].room = roomName;
+            clientInfo[socket.id].room = null;
+            clientInfo[socket.id].partner = null;
             queue.push(socket);
         }
         console.log(clientInfo);
