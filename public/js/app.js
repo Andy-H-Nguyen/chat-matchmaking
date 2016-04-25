@@ -14,8 +14,7 @@ $( document ).ready(function() {
    socket.on('connect' , function() {
       console.log('Connected to server'); 
       socket.emit('joinRoom', {
-            name: name,
-            room: room
+            name: name
          });
    });
    

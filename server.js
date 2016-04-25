@@ -9,15 +9,10 @@ var now = moment();
 app.use(express.static(__dirname + '/public'));
 
 var clientInfo = {};
-
+var queue = [];
 io.on('connection', function (socket) {
     console.log("User connected");   
-    
-    socket.emit('message', {
-        name: 'System',
-        text: 'Welcome to chat-matchmaking',
-        timestamp: moment().valueOf()
-    });
+
     
     // Disconnect Event Handler
     socket.on('disconnect', function() {
@@ -35,14 +30,44 @@ io.on('connection', function (socket) {
     
     // Join Room Event Handler
     socket.on('joinRoom', function(req) {
+    socket.emit('message', {
+        name: 'System',
+        text: 'Welcome to chat-matchmaking, we are matching you now',
+        timestamp: moment().valueOf()
+    });
+        
         clientInfo[socket.id] = req;
+        var roomName = null;
+        if (queue.length > 0) {
+            var matchedSocket = queue.pop();
+            var roomName = socket.id + '#' + matchedSocket.id;
+            var name = clientInfo[socket.id].name;
+            var matchedName = clientInfo[matchedSocket.id].name;
+            
+            
+            socket.join(roomName);
+            matchedSocket.join(roomName);
+            
+            // Update ClientInfo
+            clientInfo[socket.id].room = roomName;
+            clientInfo[matchedSocket.id].room = roomName;
+            
+            matchedSocket.in(roomName).emit('message', {
+               name: 'System',
+               text: 'You have been matched! Say hi to ' + name + ' !',
+               timestamp: moment().valueOf()
+            });
+            
+            socket.in(roomName).emit('message', {
+               name: 'System',
+               text: 'You have been matched! Say hi to ' + matchedName + ' !',
+               timestamp: moment().valueOf()
+            });
+        } else {
+            clientInfo[socket.id].room = roomName;
+            queue.push(socket);
+        }
         console.log(clientInfo);
-        socket.join(req.room);
-        socket.broadcast.to(req.room).emit('message', {
-           name: 'System',
-           text: req.name + ' has joined the room!',
-           timestamp: moment().valueOf()
-        });
     });
     
     // Message Event Handler
