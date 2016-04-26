@@ -12,12 +12,15 @@ var clientInfo = {};
 var queue = [];
 io.on('connection', function (socket) {
     console.log("User connected");   
-
-    
     // Disconnect Event Handler
     socket.on('disconnect', function() {
+        // If socket is still in queue remove that too
+        var index = queue.indexOf(socket);
+        if (index > -1) {
+            queue.splice(index, 1);
+        }
+
         var userData = clientInfo[socket.id];
-        
         if (userData) {
         var partnerId = clientInfo[socket.id].partner;
         var partnerData = clientInfo[partnerId];
