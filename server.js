@@ -95,6 +95,7 @@ io.on('connection', function (socket) {
     });
 });
 
+// Helpers
 function sendCurrentUsers(socket) {
     var info = clientInfo[socket.id];
     var users = [];
