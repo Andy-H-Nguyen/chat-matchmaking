@@ -11,3 +11,6 @@
 2. Wait for the matchmaking system to begin.
 3. If you are feeling abit lonely then open up another tab in your browser.
 4. Chat!
+
+## Technology
+Node.js + Express + Socket.io
