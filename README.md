@@ -7,6 +7,7 @@
 4. Navigate to localhost
 
 ## Demo
+0. Use either localhost or the heroku server above. 
 1. Open up the application, and type in your display name.
 2. Wait for the matchmaking system to begin.
 3. If you are feeling abit lonely then open up another tab in your browser.
